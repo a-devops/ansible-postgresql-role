@@ -21,4 +21,4 @@
     objs: "{{ item.objs }}"
     schema: "{{ item.schema }}"
     role: "{{ item.role }}"
-  with_items: "{{ users_with_pass }}"
+  with_items: "{{ all_users_grants }}"
