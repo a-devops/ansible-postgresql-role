@@ -1,0 +1,24 @@
+---
+- name: Create list of grants
+  vars:
+    users_grants: "{{ item.1.grants }}"
+  set_fact:
+    all_users_grants: "{{ all_users_grants | default([]) + [users_grants] }}"
+  loop: "{{ q('subelements', postgres_clusters, 'users', {'skip_missing': True}) }}"
+  when: item.1.grants is defined
+
+#- name: Show result
+#  debug:
+#    var: all_users_grants
+
+- name: Add GRANTs for users
+  become: yes
+  become_user: postgres
+  postgresql_privs:
+    db: "{{ item.db }}"
+    privs: "{{ item.privs }}"
+    type: "{{ item.type }}"
+    objs: "{{ item.objs }}"
+    schema: "{{ item.schema }}"
+    role: "{{ item.role }}"
+  with_items: "{{ all_users_grants }}"
